@@ -74,9 +74,9 @@ Here is the translation:
 
 ### Why Modern OS Prefers Paging Than Segmentation
 
-Irregularly-sized segments caused **fragmentation** and wasted memory space, which paging completely solves.
+Irregularly-sized segments caused **fragmentation** and wasted memory space, which paging completely solves.
 
-![image](file:///Users/yuanliheng/Desktop/CS343/Lecture%20Notes/assets/Screenshot%202025-10-25%20at%207.27.44 PM.jpg?msec=1765245072799)
+![image](assets/waste_space.jpg)
 
 **Example:**
 
@@ -169,13 +169,13 @@ We need to cache **page table entries**.
 
 The hardware uses a small, very fast cache inside the Memory Management Unit (MMU) called the **Translation Lookaside Buffer (TLB)**
 
-![image](file:///Users/yuanliheng/Desktop/CS343/Lecture%20Notes/assets/Screenshot%202025-11-22%20at%204.50.41 PM.jpg?msec=1765245072799)
+![image](assets/mmu.jpg)
 
 ##### Reducing the Amount of Physical Memory Required to Store the Page Tables
 
 We use multilevel page tables.
 
-![image](file:///Users/yuanliheng/Desktop/CS343/Lecture%20Notes/assets/Screenshot%202025-11-22%20at%204.58.21 PM.jpg?msec=1765245072801)
+![image](assets/multiple_page_tables.jpg)
 
 ### OS Paging Implementation
 

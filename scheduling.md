@@ -123,7 +123,7 @@ Temporarily increase priority for tasks holding resources that high priority tas
 
 ##### **Linux O(1) Scheduler**
 
-![image](/Users/yuanliheng/Desktop/CS343/Lecture%20Notes/assets/Screenshot%202025-12-09%20at%2012.34.13 PM.jpg)
+![image](assets/scheduling.jpg)
 
 ##### **Lottery and Stride Scheduling**
 

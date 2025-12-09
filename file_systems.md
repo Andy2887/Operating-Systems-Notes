@@ -6,7 +6,7 @@ We use disk partitions.
 
 **A disk partition is a contiguous section of a physical disk that is formatted to store a file system.**
 
-![image](file:///Users/yuanliheng/Desktop/CS343/Lecture%20Notes/assets/Screenshot%202025-11-04%20at%2012.58.46 PM.jpg?msec=1765246087636)
+![image](assets/file_system_overview.jpg)
 
 ##### Header
 
@@ -33,11 +33,11 @@ Manages file data as a **linked list** of clusters.
 
 **Inode Table (or Inode Area):** This is a fixed-size region (in older/traditional filesystems) that contains an array of all the **inodes** for the file system. Each entry in this array is a single inode data structure, and its index in the array is its unique **inode number** (i-number).
 
-![image](file:///Users/yuanliheng/Desktop/CS343/Lecture%20Notes/assets/Screenshot%202025-11-11%20at%2012.29.39 PM.jpg?msec=1765246087636)
+![image](assets/open_file.jpg)
 
 Note: "update attributes" because we might need to update things like "last read time", etc.
 
-![image](file:///Users/yuanliheng/Desktop/CS343/Lecture%20Notes/assets/Screenshot%202025-11-11%20at%2012.34.57 PM.jpg?msec=1765246087639)
+![image](assets/write_file.jpg)
 
 Note:
 
@@ -97,7 +97,7 @@ To achieve better sequential access, FFS introduced the concept of splitting the
 
 - **Goal:** By keeping the related inodes and their data blocks close together within the same group, the FFS minimizes the disk seeking required when accessing a file.
   
-  ![image](/Users/yuanliheng/Desktop/CS343/Lecture%20Notes/assets/Screenshot%202025-12-08%20at%209.51.37 PM.jpg)
+  ![image](assets/cylinder_groups.jpg)
 3. **FFS File Placement Strategy**
 
 The general theme of FFS is to **"put related pieces of data near each other"**.
@@ -158,7 +158,7 @@ The key to Copy-On-Write is that **data is never overwritten in place**. Instea
    - This new inode points to the **new data block** for the modified section.
    - It continues to point to the **original data blocks** for all the parts of the file that were *not* modified.
 3. **Resulting Versions:**
-   - The **new inode** points to the **new version** of the file.
-   - The **old inode** remains unchanged and still points to the **old version** of the file.
+   - The **new inode** points to the **new version** of the file.
+   - The **old inode** remains unchanged and still points to the **old version** of the file.
 
-![image](file:///Users/yuanliheng/Desktop/CS343/Lecture%20Notes/assets/Screenshot%202025-11-24%20at%208.49.49 PM.jpg?msec=1765246087634)
+![image](assets/copy_on_write.jpg)

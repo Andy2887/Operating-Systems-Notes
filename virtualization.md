@@ -10,7 +10,7 @@ An **emulator** is a piece of software or hardware that enables one computer sys
 
 Real world analogy: an emulator is like a translator.
 
-![image](file:///Users/yuanliheng/Desktop/CS343/Lecture%20Notes/assets/Screenshot%202025-11-29%20at%204.03.08 PM.jpg?msec=1765246348687)
+![image](assets/emulator.jpg)
 
 ### Hypervisors
 
@@ -28,4 +28,4 @@ A **hypervisor** is a layer of software that creates and runs **virtual machines
 
 The container engine provide each application with illusion of its own dedicated OS.
 
-![image](/Users/yuanliheng/Desktop/CS343/Lecture%20Notes/assets/Screenshot%202025-11-29%20at%204.01.23 PM.jpg)
+![image](assets/compare_hypervisors_and_containers.jpg)

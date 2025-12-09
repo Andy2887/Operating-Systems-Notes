@@ -42,7 +42,7 @@ Devices expose an interface of **registers** that the OS reads and writes to.
 
 A **device driver** is a specialized piece of system software that acts as a **translator** or **interface** between a computer's operating system (OS) and a specific hardware device.
 
-![image](file:///Users/yuanliheng/Desktop/CS343/Lecture%20Notes/assets/Screenshot%202025-11-25%20at%2011.43.39 AM.jpg?msec=1765246323709)
+![image](assets/device.jpg)
 
 ##### Application Layer
 
