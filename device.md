@@ -23,7 +23,7 @@ Devices expose an interface of **registers** that the OS reads and writes to.
     - You use the `OUT` instruction to **write** data *to* a specific I/O port address.
     
     - You use the `IN` instruction to **read** data *from* a specific I/O port address.
-    
+
 ![image](assets/real_time_clock.jpg)
 
 **Example: Reading Seconds from Real-Time Clock (RTC)**
