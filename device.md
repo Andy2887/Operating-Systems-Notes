@@ -23,6 +23,16 @@ Devices expose an interface of **registers** that the OS reads and writes to.
     - You use the `OUT` instruction to **write** data *to* a specific I/O port address.
     
     - You use the `IN` instruction to **read** data *from* a specific I/O port address.
+    
+![image](assets/real_time_clock.jpg)
+
+**Example: Reading Seconds from Real-Time Clock (RTC)**
+
+- `mov $0, %al`: Moves the hexadecimal value 0 into the 8-bit general-purpose register `%al`.
+
+- `out %al, $0x70`: Uses the PMIO OUT command to write the value from the `%al` register (which is 0) to the I/O port address `0x70`. Port `0x70` is the Index Register for the CMOS and RTC. Writing the index `0x00` to this port tells the RTC which register's data to prepare for reading (in this case, the Seconds register).
+
+- `in $0x71, %al`: Uses the PMIO IN command to read data from the I/O port address `0x71` and store it in the `%al` register. Port `0x71` is the Data Register for the CMOS and RTC. The data read is the current value of the Seconds register, which is then held in `%al`.
 
 - **Memory-Mapped I/O (MMIO):**
   
