@@ -1,27 +1,45 @@
 # Concurrency
 
-### Critical Sections
+## Critical Sections
 
-**Definition:**
+### Definition
 
 The code that accesses a shared resource.
 
-For read access: If all threads only read from shared memory, then it is not a critical section.
+**Read access:** If all threads only read from shared memory, then it is not a critical section.
 
-If there is at least one write, then it is a critical section.
+**Write access:** If there is at least one write, then it is a critical section.
 
-### Lock Design
+## Lock Design
 
-**Solution Requirements**
+### Solution Requirements
 
 1. No two threads may simultaneously be in their critical sections.
-
 2. Threads outside of critical sections should have no impact.
+3. No assumptions should be made about number of cores, speed of cores, or scheduler choices.
 
-3. No assumptions should be made about number of cores, speed
-   of cores, or scheduler choices.
+### Lock Types Comparison
 
-##### 1. Spinlock
+| Lock Type | Overhead | CPU Waste | Best For | Worst Case |
+|-----------|----------|-----------|----------|-----------|
+| Spinlock | Very low (~10-50 cycles) | High (busy-waiting) | Very short critical sections (<1ms) | Long held locks waste CPU |
+| Ticketlock | Low (fair access) | High | Many competing threads, fairness needed | Long held locks, low contention |
+| Yielding Lock | Medium (syscall overhead) | Low | Moderate contention, unknown lock duration | Frequent yields if lock held briefly |
+| Queueing Lock | Medium-high (syscalls, queue management) | Very low | High contention, longer lock duration | Rarely held locks (context switch overhead) |
+
+### Real-World Lock Implementations
+
+- **Linux:** Uses **Futex (Fast Userspace Mutex)**, which is a hybrid approach. Threads first try to acquire a lock with atomic operations (similar to spinlock). If the lock is already held, the kernel is called to put the thread to sleep and manage a queue. This combines low overhead for uncontended locks with fairness for contended locks.
+
+- **Windows:** Uses **Critical Sections** and **Slim Reader/Writer (SRW) Locks**. Critical sections are similar to futexes—userspace operations with kernel involvement only when blocking is needed.
+
+- **macOS/BSD:** Uses **OSSpinLock** (spinlock) and **os_lock** (efficient userspace lock). Modern versions prefer futex-like approaches for better performance.
+
+- **Java/Python:** Standard `Mutex` or `Lock` typically use OS-provided primitives (futex on Linux). Languages often provide higher-level abstractions built on these primitives.
+
+- **Pthreads (POSIX):** `pthread_mutex_t` is implementation-defined but commonly uses futex on Linux, making it efficient for both uncontended and heavily-contended scenarios.
+
+### 1. Spinlock
 
 A spinlock is a lock where the thread simply waits in a loop ("spins") repeatedly checking if the lock is available.
 
@@ -39,16 +57,18 @@ typedef struct {
 void mutex_init(lock_t* mutex) {
     mutex->flag = 0; // lock starts available
 }
+
 void mutex_acquire(lock_t* mutex) {
     // atomic_exchange(destptr, newval): Write a new value to memory, and return the old one
     while (atomic_exchange(&(mutex->flag), 1) == 1); // spin-wait until available
 }
+
 void mutex_release(lock_t* mutex) {
     atomic_store(&(mutex->flag), 0); // make lock available
 }
 ```
 
-##### 2, Ticketlock
+### 2. Ticketlock
 
 Similar Pros and Cons with Spinlock.
 
@@ -59,7 +79,7 @@ typedef struct {
 } lock_t;
 
 void mutex_init(lock_t* mutex) {
-    mutex->ticket = 0; 
+    mutex->ticket = 0;
     mutex->turn = 0;
 }
 
@@ -68,12 +88,13 @@ void mutex_lock(lock_t* mutex) {
     int myturn = atomic_fetch_and_add(&(mutex->ticket), 1); // take a ticket
     while (mutex->turn != myturn); // spin-wait until available
 }
+
 void mutex_unlock(lock_t* mutex) {
     atomic_fetch_and_add(&(mutex->turn), 1); // next turn
 }
 ```
 
-##### 3, Yielding Lock
+### 3. Yielding Lock
 
 This approach is an optimization of a spinlock that addresses the problem of busy-waiting.
 
@@ -96,7 +117,7 @@ void mutex_lock(lock_t* mutex) {
 }
 ```
 
-##### 4, Queueing Lock
+### 4. Queueing Lock
 
 - **Mechanism:**
   
@@ -110,9 +131,9 @@ void mutex_lock(lock_t* mutex) {
 
 - **Drawback (Con):** They can have unnecessary context-switch overhead if the lock is only briefly and rarely held.
 
-### Synchronization
+## Synchronization
 
-##### 1. Condition Variables (`std::condition_variable`)
+### 1. Condition Variables (`std::condition_variable`)
 
 Condition variables are used not just to protect data, but to wait for a specific *state* change (e.g., "Wait until the queue is not empty"). They allow threads to sleep until notified.
 
@@ -142,7 +163,7 @@ void thr_join() {
 }
 ```
 
-##### 2. Semaphores
+### 2. Semaphores
 
 A semaphore is like a bucket of tokens.
 
@@ -152,38 +173,232 @@ A semaphore is like a bucket of tokens.
 
 Unlike a mutex (which has ownership—only the thread that locked it can unlock it), a semaphore can be signaled by *any* thread. This makes it great for **producer-consumer** patterns or limiting concurrent access (e.g., "only allow 3 threads to access the database at once").
 
+**Simple Thread Join Example:**
+
 ```cpp
-sem_init(&s, 1)
+sem_init(&s, 0)  // Initialize with 0 tokens
 
 void thr_exit() {
-    sem_post(&s)
+    sem_post(&s)  // Signal that thread is done
 }
 
 void thr_join() {
-    sem_wait(&s)
+    sem_wait(&s)  // Wait until thread signals
 }
 ```
 
-### Synchronization Bugs
+**Producer-Consumer Pattern (with bounded buffer):**
 
-##### Atomicity violation
+```cpp
+sem_t empty;   // Tracks empty slots in buffer (initialized to BUFFER_SIZE)
+sem_t full;    // Tracks filled slots in buffer (initialized to 0)
+int buffer[BUFFER_SIZE];
+int in = 0, out = 0;
 
-An operation that should have been atomic wasn’t
+void producer(int item) {
+    sem_wait(&empty);         // Wait if buffer is full
+    // Acquire lock to protect buffer access
+    buffer[in] = item;
+    in = (in + 1) % BUFFER_SIZE;
+    // Release lock
+    sem_post(&full);          // Signal that buffer has an item
+}
 
-##### Order violation
+void consumer() {
+    sem_wait(&full);          // Wait if buffer is empty
+    // Acquire lock to protect buffer access
+    int item = buffer[out];
+    out = (out + 1) % BUFFER_SIZE;
+    // Release lock
+    sem_post(&empty);         // Signal that buffer has space
+    return item;
+}
+```
 
-Something happens sooner (or later) than expected
+**Real-World Example: Database Connection Pool**
 
-##### Deadlock
+```cpp
+sem_t pool;  // Initialized to MAX_CONNECTIONS (e.g., 5)
 
-Two threads wait indefinitely on each other
+// A thread needing database access
+void process_request() {
+    sem_wait(&pool);          // Get a connection from the pool
+    // Use database connection
+    execute_query();
+    // Release connection back to the pool
+    sem_post(&pool);
+}
+// This ensures only 5 threads use the database simultaneously
+```
 
-**Deadlock Prevention**:
+## Common Pitfalls
 
-The simplest solution is to always acquire locks in the same order.
+**1. Forgetting to Re-check Conditions After Waking**
 
-##### Livelock
+After a condition variable wakes a thread, always re-check the condition in a loop, not an `if` statement. The condition might have become false again due to other threads.
 
-Two threads repeatedly block each other from proceeding and retry
+```cpp
+// WRONG
+if (done == 0)
+    pthread_cond_wait(&cond, &lock);
 
+// CORRECT
+while (done == 0)
+    pthread_cond_wait(&cond, &lock);
+```
 
+**2. Mixing Different Synchronization Primitives Incorrectly**
+
+Don't use a spinlock where a condition variable is needed, or vice versa. Spinlocks waste CPU for waiting; condition variables have context-switch overhead.
+
+**3. Lock Ordering Mistakes**
+
+If you acquire multiple locks, always acquire them in the same order in every thread. Inconsistent ordering leads to deadlock.
+
+**4. Holding Locks Too Long**
+
+Critical sections should be as small as possible. Holding a lock while doing I/O, computation, or other long operations reduces concurrency.
+
+```cpp
+// WRONG: Lock held for entire operation
+pthread_mutex_lock(&lock);
+int value = database_query();  // Slow!
+data = process(value);
+pthread_mutex_unlock(&lock);
+
+// CORRECT: Lock held only for shared data access
+int value = database_query();
+pthread_mutex_lock(&lock);
+data = process(value);
+pthread_mutex_unlock(&lock);
+```
+
+**5. Not Signaling When Waking All Waiting Threads is Needed**
+
+Use `pthread_cond_broadcast(&cond)` when multiple threads might be waiting, not `pthread_cond_signal(&cond)` (which wakes only one thread).
+
+**6. Assuming Specific Thread Scheduling**
+
+Never assume threads execute in a particular order. Always synchronize explicitly with locks and condition variables.
+
+## Synchronization Bugs
+
+### Atomicity Violation
+
+An operation that should have been atomic wasn't.
+
+**Example of Broken Code:**
+
+```cpp
+// Shared variable
+int balance = 100;
+
+// Thread 1: Withdraw $50
+int temp = balance;      // Read: temp = 100
+temp = temp - 50;        // Compute: temp = 50
+balance = temp;          // Write: balance = 50
+
+// Thread 2: Withdraw $30 (interleaves with Thread 1)
+int temp2 = balance;     // Read: temp2 = 100 (balance not updated yet!)
+temp2 = temp2 - 30;      // Compute: temp2 = 70
+balance = temp2;         // Write: balance = 70
+
+// Result: balance = 70, but should be 20!
+// Money was lost due to non-atomic reads/writes
+```
+
+**Fix:** Protect the entire operation with a lock:
+
+```cpp
+pthread_mutex_lock(&lock);
+int temp = balance;
+temp = temp - amount;
+balance = temp;
+pthread_mutex_unlock(&lock);
+```
+
+### Order Violation
+
+Something happens sooner (or later) than expected.
+
+**Example of Broken Code:**
+
+```cpp
+// Thread 1
+void init() {
+    value = 42;           // Initialize value
+    initialized = 1;      // Signal initialization complete
+}
+
+// Thread 2
+void use_value() {
+    while (initialized == 0)  // Wait for initialization
+        ;  // Spin-wait
+    printf("%d\n", value);    // Print value
+}
+
+// Problem: Without synchronization, Thread 2 might read an
+// outdated or partially-written 'value', or the compiler might
+// reorder instructions, causing initialized to be set before value
+```
+
+**Fix:** Use a condition variable:
+
+```cpp
+// Thread 1
+pthread_mutex_lock(&lock);
+value = 42;
+initialized = 1;
+pthread_cond_signal(&cond);
+pthread_mutex_unlock(&lock);
+
+// Thread 2
+pthread_mutex_lock(&lock);
+while (initialized == 0)
+    pthread_cond_wait(&cond, &lock);
+printf("%d\n", value);
+pthread_mutex_unlock(&lock);
+```
+
+### Deadlock
+
+Two threads wait indefinitely on each other.
+
+**Example of Broken Code:**
+
+```cpp
+// Thread 1
+pthread_mutex_lock(&lock1);        // Acquire lock1
+sleep(1);                           // ... do work ...
+pthread_mutex_lock(&lock2);        // Try to acquire lock2 (BLOCKED!)
+pthread_mutex_unlock(&lock2);
+pthread_mutex_unlock(&lock1);
+
+// Thread 2
+pthread_mutex_lock(&lock2);        // Acquire lock2
+sleep(1);                           // ... do work ...
+pthread_mutex_lock(&lock1);        // Try to acquire lock1 (BLOCKED!)
+pthread_mutex_unlock(&lock1);
+pthread_mutex_unlock(&lock2);
+
+// Deadlock: Thread 1 waits for lock2 (held by Thread 2)
+//           Thread 2 waits for lock1 (held by Thread 1)
+// Both threads hang forever
+```
+
+**Deadlock Prevention:** Always acquire locks in the same order across all threads:
+
+```cpp
+// All threads follow this order: lock1, then lock2
+pthread_mutex_lock(&lock1);
+pthread_mutex_lock(&lock2);
+// ... critical section ...
+pthread_mutex_unlock(&lock2);
+pthread_mutex_unlock(&lock1);
+```
+
+### Livelock
+
+Two threads repeatedly block each other from proceeding and retry.
+
+**Example:** Two threads try to acquire locks, but each time one succeeds in acquiring one lock, the other thread also tries and they keep interfering with each other's attempts, causing repeated retries instead of progress.
