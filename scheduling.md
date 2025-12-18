@@ -4,7 +4,7 @@
 
 **Definition**:
 
-Switching from process to kernel or kernel to process
+The process of suspending the current process/kernel context and resuming another, including saving and restoring CPU state (registers, program counter, etc.)
 
 High-level steps for switching to the process:
 
@@ -64,25 +64,30 @@ Differences from batch systems
 
 **Schedulers for interactive systems:**
 
-**1, Round Robin**
+**1. Round Robin**
 
-Runs a job for a small timeslice, then schedules the next job
+Runs a job for a small timeslice, then schedules the next job.
 
-*Edge Case: Assume timeslice is 5 but job completes at 2. Solution: schedule a new job with a new, full timeslice*
+**Edge Case**: If a job completes before its timeslice expires, immediately schedule the next job with a fresh timeslice (no wasted time). For example, if the timeslice is 5 but a job completes at 2, the next job gets a full timeslice of 5.
 
-**2, Multi-Level Feedback Queue**
+**2. Multi-Level Feedback Queue**
 
-rules:
+**Rules:**
 
 1. If J1 priority > J2 priority, runs J1
-
 2. If J1 priority = J2 priority, run in Round Robin
-
 3. Jobs start at top priority
-
 4. When a job uses its time quota for a level, demote it one level
+5. Every S seconds, reset priority of all jobs to top (prevents starvation)
 
-5. Every S seconds, reset priority of all jobs to top
+### Batch vs Interactive Systems Comparison
+
+| Aspect | Batch Systems | Interactive Systems |
+|--------|---------------|-------------------|
+| **User involvement** | Jobs run without user interaction | Users interact during execution |
+| **Job duration** | Predefined | Often unknown |
+| **Key metric** | Throughput (maximize jobs/time) | Response time (minimize wait before execution) |
+| **Example schedulers** | FIFO, SJF, SRPT | Round Robin, MLFQ |
 
 ## Real Time Operating Systems
 
@@ -115,11 +120,15 @@ Job A runs first.
 
 ### Priority Inversion
 
-Temporarily increase priority for tasks holding resources that high priority tasks need
+**Problem**: A low-priority task holding a resource (lock) can block a high-priority task waiting for that resource, causing the high-priority task to miss its deadline.
+
+**Solution** (Priority Inheritance): Temporarily increase the priority of the low-priority task to match the high-priority task waiting on it. This allows the low-priority task to finish and release the resource quickly, unblocking the high-priority task.
 
 
 
 ## Modern Operating Systems
+
+Modern operating systems must balance fairness, responsiveness, and priority while managing thousands of concurrent jobs efficiently.
 
 ### Linux O(1) Scheduler
 
