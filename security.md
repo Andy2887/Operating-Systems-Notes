@@ -1,6 +1,6 @@
 # Security
 
-### Design For Security
+## Design For Security
 
 - **Trusted Computing Base (TCB):** The TCB is the small, foundational part of the system that *must* be trusted to enforce the system's overall **security policy**. TCB components include the scheduler, memory management, and parts of the file system and device drivers.
 
@@ -28,9 +28,7 @@
   
   - What you are (biometrics).
 
-### 
-
-### Memory Attack and Defenses
+## Memory Attack and Defenses
 
 - **Buffer Overflow:** Arrays (buffers) are not bounds checked, allowing data to be written past the end of the array and overwriting data or the stack section. 
 
@@ -44,7 +42,7 @@
 
 
 
-### Speculative Execution Attacks
+## Speculative Execution Attacks
 
 **Background:**
 
@@ -57,13 +55,6 @@
   - If the attacker guesses the first character correctly, the comparison takes slightly *longer* because it moves to the second character before failing.
   
   - If the attacker guesses the first five characters correctly, the comparison takes even *longer*.
-
-
-
-
-
-
-
 
 
 

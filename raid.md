@@ -10,7 +10,7 @@ The key benefits of using a RAID array are to:
 
 - **Increase throughput** by accessing data in parallel on multiple disks.
 
-**RAID Implementation**
+## RAID Implementation
 
 RAID can be implemented in two ways:
 
@@ -18,21 +18,19 @@ RAID can be implemented in two ways:
 
 - **Hardware RAID:** A specialized controller card coordinates the multiple disks, presenting the interface of one disk to the OS.
 
-### **Common RAID Levels**
+## Common RAID Levels
 
 - **RAID 0 – Striping:** RAID 0 splits (stripes) data evenly across two or more disks. It does not provide redundancy. If you write a file, the system breaks it into blocks and writes block A to Drive 1, block B to Drive 2, and so on simultaneously.
 
 - **RAID 1 – Mirroring:** RAID 1 writes the exact same data to two (or more) drives simultaneously. If you have two 1TB drives, your total storage is still only 1TB, but your data is identical on both.
 
-##### The Core Concept: What is Parity?
+### The Core Concept: What is Parity?
 
 Before looking at the levels, it helps to understand parity. Parity is a calculated value (usually using the **XOR** operation) used to reconstruct data.
 
 - If you have **Disk A** and **Disk B**, and you store their sum on **Disk C** (Parity), you can lose *any* one of those three disks and figure out what was on it by doing the math with the remaining two.
 
----
-
-##### RAID 4: Dedicated Parity Disk
+### RAID 4: Dedicated Parity Disk
 
 **"Striped data, centralized parity."**
 
@@ -44,7 +42,7 @@ RAID 4 stripes data across multiple disks (like RAID 0) but reserves one specifi
 
 - **Status:** Obsolete. It has largely been replaced by RAID 5, which solves the bottleneck issue.
 
-##### RAID 5: Distributed Parity
+### RAID 5: Distributed Parity
 
 **"Striped data, rotating parity."**
 
@@ -68,7 +66,7 @@ RAID 5 improves on RAID 4 by eliminating the dedicated parity disk. Instead, it 
 
 - **The Risk (The "Write Hole" & URE):** If a drive fails, the array enters "degraded mode." You must replace the drive immediately. During the rebuild (which can take hours or days), the other disks are under heavy load. If a second error (like a Unrecoverable Read Error) occurs during this rebuild, you lose data.
 
-##### RAID 6: Double Distributed Parity
+### RAID 6: Double Distributed Parity
 
 **"Striped data, double rotating parity."**
 

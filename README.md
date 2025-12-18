@@ -2,7 +2,7 @@
 
 A comprehensive collection of notes covering operating systems concepts.
 
-## 📚 Study Guide
+## Study Guide
 
 ### 1. **Foundation: Process Management & Scheduling**
 Start here to understand how operating systems manage processes and CPU time allocation.

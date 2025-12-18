@@ -1,6 +1,6 @@
 # File Systems
 
-### How File Systems Are Stored On Disk?
+## How File Systems Are Stored On Disk
 
 We use disk partitions.
 
@@ -8,11 +8,11 @@ We use disk partitions.
 
 ![image](assets/file_system_overview.jpg)
 
-##### Header
+### Header
 
 Generic view of any filesystem
 
-##### Free Space Tracking
+### Free Space Tracking
 
 Track which blocks in “File Data” are in use.
 
@@ -23,13 +23,13 @@ We use **bitmap**:
 1. **Representation:** Each data block on the disk is represented by a single bit.
 2. **Mapping:** A bit is set to indicate whether the corresponding block is **free** (e.g., 1) or **used** (e.g., 0), or vice versa. Every block is listed in order.
 
-##### File Tracking
+### File Tracking
 
-**Allocation Table**
+#### Allocation Table
 
 Manages file data as a **linked list** of clusters.
 
-**Inode**
+#### Inode
 
 **Inode Table (or Inode Area):** This is a fixed-size region (in older/traditional filesystems) that contains an array of all the **inodes** for the file system. Each entry in this array is a single inode data structure, and its index in the array is its unique **inode number** (i-number).
 
@@ -49,13 +49,13 @@ Note:
 
 - **Inode Bitmap:** Tracks the usage of **inodes**, which hold the *metadata* (like permissions, size, and block pointers) for files and directories.16 A bit in the Inode Bitmap is 171 if the inode structure is in use, and 180 if it's free to be allocated for a new file.
 
-### File System Optimization
+## File System Optimization
 
 **Why we need file system caching?**
 
 Cache popular blocks so the disk can be accessed less frequently.
 
-##### Unified Page Cache
+### Unified Page Cache
 
 Page replacement policy will consider both pages from memory pages, which stores temporary data, and pages cached from disk.
 
@@ -67,15 +67,15 @@ Page replacement policy will consider both pages from memory pages, which stores
 
 Note: swap space is an "intermediate stop" between disk and RAM.
 
-##### Classical File Systems (FAT vs FFS)
+### Classical File Systems (FAT vs FFS)
 
-**File Allocation Table**
+#### File Allocation Table
 
-Allocation table for tracking data blocks
+Allocation table for tracking data blocks.
 
-Still in use for embedded systems
+Still in use for embedded systems.
 
-**Fast File System**
+#### Fast File System
 
 1. **The Problem FFS Solved**
 
@@ -117,11 +117,11 @@ FFS prioritizes **small files** because they are the most common. However, thi
 - **The Problem:** A single large file could fill up nearly an entire cylinder group, meaning any remaining files (even small ones) would have to be placed in other, distant groups.
 
 - **The Solution:** FFS limits the maximum file size per group. If a file exceeds this limit, its remaining blocks are placed in other, less full cylinder groups. 
-4. **FFS in the Modern Context**
+5. **FFS in the Modern Context**
 
 While FFS was revolutionary for its time, the document notes that its ideals are **"no longer relevant"** for many modern systems (Page 23).
 
-##### Improving Reliability
+### Improving Reliability
 
 - **FSCK (File System Checker)**
   
@@ -141,7 +141,7 @@ While FFS was revolutionary for its time, the document notes that its ideals are
     - **Crash before commit:** Data in journal, but no commit message. Clear the log (rollback).
     - **Crash after commit:** Journal has commit message. Replay the transaction from the beginning, then clear the journal.
 
-##### Copy On Write
+### Copy On Write
 
 CoW is an approach to improving reliability and functionality in a filesystem.
 

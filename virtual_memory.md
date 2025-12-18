@@ -1,6 +1,6 @@
 # Virtual Memory
 
-### Segmentation
+## Segmentation
 
 **Instructions:**
 
@@ -30,7 +30,7 @@
    
    - Physical Address = `0x4000` + `0x0234` = `0x4234`
 
-### Paging
+## Paging
 
 The hardware (Memory Management Unit, or MMU) splits every virtual address into two parts:
 
@@ -72,7 +72,7 @@ Here is the translation:
 5. **Access Memory (Hardware Step 4):**
    - The MMU uses the newly calculated **Physical Address (`0x7004`)** to access the RAM location.
 
-### Why Modern OS Prefers Paging Than Segmentation
+## Why Modern OS Prefers Paging Than Segmentation
 
 Irregularly-sized segments caused **fragmentation** and wasted memory space, which paging completely solves.
 
@@ -96,7 +96,7 @@ We are going to load and remove processes in this order:
 
 ---
 
-##### Case 1: Segmentation (Variable Sizes)
+### Case 1: Segmentation (Variable Sizes)
 
 In segmentation, we allocate exactly the amount of continuous space a program needs.
 
@@ -124,7 +124,7 @@ In segmentation, we allocate exactly the amount of continuous space a program ne
 
 ---
 
-##### Case 2: Paging (Fixed Sizes)
+### Case 2: Paging (Fixed Sizes)
 
 In paging, we divide memory into fixed blocks. Let's say the **Page Size is 4 KB**.
 
@@ -161,9 +161,9 @@ In paging, we divide memory into fixed blocks. Let's say the **Page Size is 4 KB
 
 **The Result (No External Fragmentation):** We successfully loaded Program D! In paging, **if you have enough total free memory, you can always load the program.** The "holes" don't matter because the hardware can jump between any two frames instantly using the Page Table.
 
-### Virtual Memory Optimization
+## Virtual Memory Optimization
 
-##### Improving Translation Speed
+### Improving Translation Speed
 
 We need to cache **page table entries**.
 
@@ -171,17 +171,17 @@ The hardware uses a small, very fast cache inside the Memory Management Unit (MM
 
 ![image](assets/mmu.jpg)
 
-##### Reducing the Amount of Physical Memory Required to Store the Page Tables
+### Reducing the Amount of Physical Memory Required to Store the Page Tables
 
 We use multilevel page tables.
 
 ![image](assets/multiple_page_tables.jpg)
 
-### OS Paging Implementation
+## OS Paging Implementation
 
 The OS uses a higher-level abstraction called a **region**. A region is just a contiguous chunk of virtual memory, like the code section, stack section, or heap section. The OS keeps a list of these regions for each process.
 
-**Key Feature 1: Lazy Loading**
+### Key Feature 1: Lazy Loading
 
 When you start a program, the OS doesn't need to load the entire executable file from disk into RAM. That would be slow, and the program might not even use all its code.
 
@@ -195,7 +195,7 @@ Instead, the OS does **lazy loading**:
 
 This "demand paging" means pages are only loaded from disk when they are first needed.
 
-**Key Feature 2: Copy-on-Write (CoW)**
+### Key Feature 2: Copy-on-Write (CoW)
 
 When a process calls `fork()`, the OS must create a near-identical copy of it. Copying all of the parent's memory would be very slow and wasteful, especially since the child process often just calls `exec()` immediately (loading a new program).
 
@@ -211,7 +211,7 @@ Instead, the OS uses **Copy-on-Write (CoW)**:
 
 This way, pages are only copied if and when they are actually written to.
 
-### OS Paging Implementation
+### Understanding Regions
 
 A **Region** is a data structure used by the OS to manage a process's virtual memory space (address space).
 
@@ -227,7 +227,7 @@ The process is:
 
 3. **Pages** (Fixed-size subdivisions of the regions).
 
-##### What Does Region Keep Track of
+### What Does Region Keep Track of
 
 - **Starting Page/Address and Size:** Defines the location and extent of the region in virtual memory.
 - **Protection Fields:** Permissions for the memory (e.g., read-only, read-and-write).
@@ -241,7 +241,7 @@ The process is:
   - **Fresh, zeroed-out memory** (Anonymous Mapping, used for the stack and heap).
   - A **copy of a file from disk** (File-backed Mapping, used for program code).
 
-##### Operations of Region
+### Operations of Region
 
 | Operation   | Description                                                                                                                                           |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -250,7 +250,7 @@ The process is:
 | **Move**    | Changes the physical addresses associated with the region.                                                                                            |
 | **Protect** | Changes the protection status of the region (e.g., from read-only to read-and-write).                                                                 |
 
-##### Lazy vs. Eager Region Allocation
+### Lazy vs. Eager Region Allocation
 
 When a new region is added, the OS has a choice about when to allocate the physical memory and update the page table:
 
@@ -264,7 +264,7 @@ When a new region is added, the OS has a choice about when to allocate the physi
 
 Swapping is a mechanism where the Operating System moves some pages of a process from **Physical Memory (RAM) to Disk**. It allows processes to continue running even when not all of their pages are in physical memory.
 
-##### How Swapping Works
+### How Swapping Works
 
 **Location of Pages:**
 
@@ -298,16 +298,16 @@ When the hardware walks the page tables and finds the page is valid but **Not P
 
 Only **modified** pages need to be saved to the disk if they are swapped out.
 
-##### Swapping Policies
+### Swapping Policies
 
 The OS has policies to determine: 1) When to bring a page in (Selection) and 2) When to swap a page out (Replacement).
 
-<u>A. Page Selection (When to Load Pages)</u>
+**A. Page Selection (When to Load Pages)**
 
 - **Demand Paging (Lazy):** Load a page only when a page fault occurs (when it absolutely must be in memory).
 - **Pre-paging (Prefetching):** Load a page before it is referenced (OS predicts future accesses).
 
-<u>B. Page Replacement (Which Page to Evict)</u>
+**B. Page Replacement (Which Page to Evict)**
 
 The goal is to minimize **hard page faults**.
 
@@ -318,7 +318,7 @@ The goal is to minimize **hard page faults**.
   - *Advantage:* With locality, LRU approximates Optimal performance.
   - *Disadvantage:* Hard to implement perfectly as it requires tracking the access time for every page.
 
-<u>C. Implementing LRU (Clock Algorithm)</u>
+**C. Implementing LRU (Clock Algorithm)**
 
 Because perfect LRU is complex and slow, modern systems use approximations, such as the **Clock Algorithm**:
 

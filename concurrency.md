@@ -163,6 +163,55 @@ void thr_join() {
 }
 ```
 
+**Producer-Consumer Example with Bounded Buffer:**
+
+```cpp
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond_full = PTHREAD_COND_INITIALIZER;
+pthread_cond_t cond_empty = PTHREAD_COND_INITIALIZER;
+
+int buffer[10];
+int count = 0;  // Number of items in buffer
+int in = 0;     // Position to insert
+const int BUFFER_SIZE = 10;
+
+void producer(int item) {
+    pthread_mutex_lock(&lock);
+
+    // Wait if buffer is full
+    while (count == BUFFER_SIZE)
+        pthread_cond_wait(&cond_empty, &lock);
+
+    // Insert item
+    buffer[in] = item;
+    in = (in + 1) % BUFFER_SIZE;
+    count++;
+
+    // Signal that buffer has an item
+    pthread_cond_signal(&cond_full);
+
+    pthread_mutex_unlock(&lock);
+}
+
+int consumer() {
+    pthread_mutex_lock(&lock);
+
+    // Wait if buffer is empty
+    while (count == 0)
+        pthread_cond_wait(&cond_full, &lock);
+
+    // Extract item
+    int item = buffer[(in - count) % BUFFER_SIZE];
+    count--;
+
+    // Signal that buffer has space
+    pthread_cond_signal(&cond_empty);
+
+    pthread_mutex_unlock(&lock);
+    return item;
+}
+```
+
 ### 2. Semaphores
 
 A semaphore is like a bucket of tokens.

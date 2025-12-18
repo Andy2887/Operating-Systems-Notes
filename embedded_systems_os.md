@@ -1,6 +1,6 @@
 # Embedded Systems OS
 
-**Why Embedded Systems need their own OS?**
+## Why Embedded Systems Need Their Own OS
 
 Embedded systems require their own operating systems because normal Linux cannot be used. Reasons include:
 
@@ -10,37 +10,29 @@ Embedded systems require their own operating systems because normal Linux cannot
 
 3. A full Linux kernel constantly manages many processes and services, even when the system appears idle, leading to unnecessary power consumption. And power consumption is a critical design constraint for most embedded devices.
 
-##### Typical Embedded OS Design
+## Typical Embedded OS Design
 
-**🎯 Single-Purpose Focus**
+### Single-Purpose Focus
 
 The **core assumption** in traditional embedded design is that the device has one single, primary function (e.g., a microwave controller, a remote sensor, or a simple medical monitor).
 
----
-
-**🧩 Combined Kernel and Application**
+### Combined Kernel and Application
 
 The application code and the OS kernel code are **compiled together** into one program. When the device boots, this single program begins execution. In this model, the **application logic is dominant**. The kernel is often reduced to a minimal set of services needed to support the application.
 
----
-
-**🔄 Cooperative Multitasking**
+### Cooperative Multitasking
 
 The single application is typically broken down into **multiple tasks** (sometimes called threads) that appear to run simultaneously. These tasks must **voluntarily yield** control to the OS scheduler so another task can run. If one task hangs or runs too long without yielding, it can block the entire system.
 
 This approach simplifies the kernel design by **removing complex pre-emptive scheduling logic**. The system is designed this way because all tasks belong to the same trusted application and are presumed to **cooperate** for the good of the system.
 
----
-
-**🛠️ Minimalist Kernel with Drivers**
+### Minimalist Kernel with Drivers
 
 The OS kernel itself is stripped down to the bare essentials required for the specific hardware and application.
 
 The largest functional part of the kernel is usually the **hardware drivers**—code that directly controls the hardware.
 
----
-
-**🛡️ No Protection and Minimal Resource Management**
+### No Protection and Minimal Resource Management
 
 The most significant difference from general-purpose OSes is the lack of protection.
 

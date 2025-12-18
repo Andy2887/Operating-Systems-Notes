@@ -4,7 +4,9 @@
 
 The OS needs to communicate with devices quickly and efficiently.
 
-##### Connecting to Devices
+## Device I/O Basics
+
+### Connecting to Devices
 
 **I/O Hierarchy:** Devices connect to the CPU via a hierarchy of buses. Fast connections (like the Memory Bus) are physically close to the CPU, while slower, more flexible protocols are farther away (like the Peripheral I/O Bus: SCSI, SATA, USB).
 
@@ -12,7 +14,7 @@ The OS needs to communicate with devices quickly and efficiently.
 
 A **bus** is fundamentally a **shared communication path** for data transfer within a computer system.
 
-##### Talking to Devices
+### Talking to Devices
 
 Devices expose an interface of **registers** that the OS reads and writes to.
 
@@ -39,7 +41,7 @@ Devices expose an interface of **registers** that the OS reads and writes to.
   - Certain **physical memory addresses** are mapped to I/O devices instead of RAM.
   - Any instruction that accesses memory can access these devices.
 
-##### Device Interactions
+### Device Interactions
 
 - **Synchronous vs. Asynchronous Events:**
   - **Polling (Synchronous):** The CPU repeatedly checks a device's **STATUS** register to see if it is ready or has completed an operation. This is simple but wastes CPU time for slow devices.
@@ -48,13 +50,13 @@ Devices expose an interface of **registers** that the OS reads and writes to.
   - **Programmed I/O (PIO):** The CPU is involved in reading or writing **every byte** of data to/from the device's data registers using normal memory accesses. This is time-consuming for large transfers.
   - **Direct Memory Access (DMA):** A hardware **DMA controller** is used to handle large data transfers between the device and main memory **without constant CPU involvement**. The CPU only programs the DMA controller with the address, size, and control, and is notified with an interrupt when the transfer is complete.
 
-### Device Driver
+## Device Driver
 
 A **device driver** is a specialized piece of system software that acts as a **translator** or **interface** between a computer's operating system (OS) and a specific hardware device.
 
 ![image](assets/device.jpg)
 
-##### Application Layer
+### Application Layer
 
 Applications interact with devices primarily through **system calls**.
 
@@ -62,7 +64,7 @@ Applications interact with devices primarily through **system calls**.
   - **Synchronous I/O:** Calls like `read/write` **block** the process until the operation is complete.
   - **Asynchronous I/O:** Calls (`aio_read`/`aio_write`) enqueue the request and allow the process to continue execution (**non-blocking**). The process later checks the status (`aio_error`) and retrieves the result (`aio_return`).
 
-##### I/O Subsystem
+### I/O Subsystem
 
 - **Manages Permissions**
 - **Routes Calls** to the appropriate driver.
@@ -71,7 +73,7 @@ Applications interact with devices primarily through **system calls**.
   - **Address Translation:** Translating user-provided virtual addresses to physical addresses, or copying data.
   - **Buffering:** Holding a copy of data in the kernel, especially for asynchronous operations.
 
-##### Device Driver
+### Device Driver Implementation
 
 The device driver is the **device-specific code** that communicates directly with the hardware.
 

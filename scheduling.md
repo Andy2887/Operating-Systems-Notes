@@ -1,6 +1,6 @@
 # Scheduling
 
-### Context Switching
+## Context Switching
 
 **Definition**:
 
@@ -22,7 +22,7 @@ High-level steps for switching to the kernel:
 4. Restore kernel registers
 5. Figure out why a context switch occurred
 
-### Batch Systems
+## Batch Systems
 
 **Definition:**
 
@@ -46,9 +46,9 @@ Example: payment system
    
    • Schedule job with smallest duration first
    • Preempt a running job when new jobs arrive
-   • Then schedule job with smallest <u>remaining duration</u>
+   • Then schedule job with smallest **remaining duration**
 
-### Interactive Systems
+## Interactive Systems
 
 **Definition:**
 
@@ -84,7 +84,7 @@ rules:
 
 5. Every S seconds, reset priority of all jobs to top
 
-### Real Time Operating Systems
+## Real Time Operating Systems
 
 The primary goal is to:
 
@@ -94,11 +94,11 @@ The primary goal is to:
 
 - Prioritize predictability, as it is key to providing a performance guarantee.
 
-##### Earliest Deadline First scheduling
+### Earliest Deadline First Scheduling
 
 Definition: highest priority given to task with soonest deadline
 
-##### Rate Monotonic scheduling
+### Rate Monotonic Scheduling
 
 Definition:
 
@@ -113,19 +113,19 @@ Assign fixed priority of **1/Period** for each job
 
 Job A runs first.
 
-##### Priority Inversion
+### Priority Inversion
 
 Temporarily increase priority for tasks holding resources that high priority tasks need
 
 
 
-### Modern Operating Systems
+## Modern Operating Systems
 
-##### **Linux O(1) Scheduler**
+### Linux O(1) Scheduler
 
 ![image](assets/scheduling.jpg)
 
-##### **Lottery and Stride Scheduling**
+### Lottery and Stride Scheduling
 
 - **Lottery Scheduling**: Jobs are given "tickets" based on the proportion of CPU time they should receive. Every time quantum, one ticket is drawn at random, and the corresponding job is scheduled to run. This method is probabilistic and therefore not suitable for real-time systems.
 
@@ -141,7 +141,7 @@ Temporarily increase priority for tasks holding resources that high priority tas
 
 
 
-##### Linux Completely Fair Scheduler
+### Linux Completely Fair Scheduler
 
 - **Mechanism**: The scheduler tracks the processor time (referred to as **virtual runtime**) given to each job so far.
 
