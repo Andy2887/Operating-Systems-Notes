@@ -163,6 +163,22 @@ void thr_join() {
 }
 ```
 
+**Q&A:**
+
+**Q1: Why do we need the `done` variable?**
+
+A: The `done` variable is essential because condition variables do not have memory—they don't remember if they were signaled. If `thr_exit()` runs before `thr_join()`, the signal would be lost without the `done` flag. When `thr_join()` later calls `wait()`, it would block forever waiting for a signal that already happened. The `done` variable captures the state change so that `thr_join()` can check it and avoid waiting unnecessarily.
+
+**Q2: Why do we put `cond_wait` in a `while` loop instead of an `if` statement?**
+
+A: There are two reasons:
+
+1. **Spurious wakeups:** The POSIX specification allows `pthread_cond_wait` to return even when no thread has signaled the condition variable. These are called "spurious wakeups" and can occur due to implementation details in the OS or threading library. A `while` loop ensures we re-check the condition after any wakeup.
+
+2. **Multiple waiters:** If multiple threads are waiting and `pthread_cond_broadcast()` wakes them all, only one may successfully proceed (e.g., consume an item from a buffer). The others must re-check the condition and go back to waiting if the condition is no longer true.
+
+Using `while` instead of `if` guarantees correctness regardless of how many times or why the thread wakes up.
+
 **Producer-Consumer Example with Bounded Buffer:**
 
 ```cpp
