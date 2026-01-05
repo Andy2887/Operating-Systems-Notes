@@ -45,9 +45,9 @@ Note:
 
 2, difference between data bitmap and inode bitmap:
 
-- **Data Bitmap (or Block Bitmap):** Tracks the usage of **data blocks**, which hold the actual *content* of files.15
+- **Data Bitmap (or Block Bitmap):** Tracks the usage of **data blocks**, which hold the actual *content* of files.
 
-- **Inode Bitmap:** Tracks the usage of **inodes**, which hold the *metadata* (like permissions, size, and block pointers) for files and directories.16 A bit in the Inode Bitmap is 171 if the inode structure is in use, and 180 if it's free to be allocated for a new file.
+- **Inode Bitmap:** Tracks the usage of **inodes**, which hold the *metadata* (like permissions, size, and block pointers) for files and directories. A bit in the Inode Bitmap is 1 if the inode structure is in use, and 0 if it's free to be allocated for a new file.
 
 ## File System Optimization
 
